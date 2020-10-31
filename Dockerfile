@@ -1,20 +1,9 @@
-# FROM python:3.7
-
-# VOLUME /config
-# WORKDIR /config
-
-# RUN apt-get update && apt-get install -y \
-#     portaudio19-dev \
-#     python-pip \
-#     gcc 
-
-# RUN pip install ledfx
-
-FROM python:3.7-alpine
+FROM python:3.6-alpine
 
 VOLUME /config
 WORKDIR /config
-
+RUN apk update
+RUN apk add py3-pip
 RUN \
     apk add --no-cache --virtual .build-dependencies \
         cython \
@@ -28,13 +17,10 @@ RUN \
         alsaconf \
         alsa-plugins-pulse \
         lua-resty-http \
-        portaudio-dev 
-
-RUN pip3 install ledfx \
+        portaudio-dev  
+        
+ADD ledfx-dev /tmp/ledfx-dev
+RUN cd /tmp/ledfx-dev && pip install -v -e . \
     && apk del --no-cache --purge .build-dependencies
-
-
-COPY run.sh /run.sh
-CMD ["/run.sh"]
-
-EXPOSE 8888
+EXPOSE 8888/tcp
+ENTRYPOINT [ "ledfx"]
