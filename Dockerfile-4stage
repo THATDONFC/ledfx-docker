@@ -1,0 +1,61 @@
+### Create docker image from python3.7-slim
+#
+# Set up base venv image to start the build
+FROM python:3.7-slim AS venv-image
+# Create python venv and add it to PATH
+RUN python -m venv /ledfx/venv
+ENV PATH="/ledfx/venv/bin:$PATH"
+# Install dependencies and ledfx, remove uneeded packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        alsa-utils \
+        libasound2 \
+        libasound2-plugins \
+        portaudio19-dev \
+        pulseaudio \
+    && apt-get clean -y \
+    && apt-get autoremove -y
+
+### Create docker image from venv-image as compile-image to speed up builds
+#
+FROM venv-image AS compile-image
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        gcc \
+        libc-dev \
+        nodejs \
+        npm \
+        git
+
+### Create docker image from compile-image to pull and build from github
+#
+FROM compile-image AS build-image
+COPY --from=venv-image /ledfx/venv /ledfx/venv
+ENV PATH="/ledfx/venv/bin:$PATH"
+WORKDIR /ledfx-git
+RUN git clone https://github.com/THATDONFC/ledfx -b dev /ledfx-git \
+      && cd /ledfx-git/frontend \
+      && npm install -g yarn \
+      && yarn && yarn build \
+      && cd ..
+RUN pip install -r requirements.txt
+RUN pip install .
+#     && mkdir ledfx-wheel \
+#     && python setup.py bdist_wheel -d ledfx-wheel
+
+# Create docker image from venv-image to build dist-image
+#
+FROM venv-image AS dist-image
+
+COPY --from=build-image /ledfx/venv /ledfx/venv
+ENV PATH="/ledfx/venv/bin:$PATH"
+
+RUN rm -rf /var/lib/apt/lists/*
+
+RUN useradd --create-home ledfx
+WORKDIR /home/ledfx
+USER ledfx
+
+EXPOSE 8888/tcp
+EXPOSE 5353/udp
+ENTRYPOINT [ "ledfx"]
+# CMD ["--host 0.0.0.0","-p 8888"]
+
