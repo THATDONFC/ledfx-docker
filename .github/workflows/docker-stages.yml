@@ -46,6 +46,12 @@ jobs:
       - name: Build ${{ env.IMAGE_NAME }}
         run: |
           docker build --file Dockerfile.venv --tag ledfx-venv .
+          ls -lahF
+      - name: Upload ledfx-venv to /
+        uses: actions/upload-artifact@v2
+        with:
+          name: ledfx-venv
+          path: /
           
   ledfx-compile:
     needs: ledfx-venv  
@@ -55,10 +61,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Download ledfx-venv
+        uses: actions/download-artifact@v2
+        with:
+          name: ledfx-venv
       - uses: actions/checkout@v2
       - name: Build ${{ env.IMAGE_NAME }}
         run: |
           docker build --file Dockerfile.compile --tag ledfx-compile .
+      - name: Upload ledfx-venv to /
+        uses: actions/upload-artifact@v2
+        with:
+          name: ledfx-venv
+          path: /
+      - name: Upload ledfx-compile to /
+        uses: actions/upload-artifact@v2
+        with:
+          name: ledfx-compile
+          path: /
   
   ledfx-build:
     needs: [ledfx-venv, ledfx-compile]  
@@ -68,6 +88,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Download ledfx-venv
+        uses: actions/download-artifact@v2
+        with:
+          name: ledfx-venv
+      - name: Download ledfx-compile
+        uses: actions/download-artifact@v2
+        with:
+          name: ledfx-compile
       - uses: actions/checkout@v2
       - name: Build ${{ env.IMAGE_NAME }}
         run: |
