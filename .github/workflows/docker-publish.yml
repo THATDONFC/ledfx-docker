@@ -2,33 +2,17 @@ name: Docker
 
 on:
   push:
-    # Publish `main` as Docker `latest` image.
     branches:
       - main
-
-    # Publish `v1.2.3` tags as releases.
     tags:
       - v*
-
-env:
-  IMAGE_NAME: ledfx
 
 jobs:
   ledfx:
     env:
       IMAGE_NAME: ledfx
-    name: Build LedFx on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macOS-latest, windows-latest]
-        include:
-          - os: windows-latest
-            shell: cmd
-          - os: ubuntu-latest
-            shell: bash
-          - os: macOS-latest
-            shell: bash
+    name: Build LedFx on ubuntu-latest
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
