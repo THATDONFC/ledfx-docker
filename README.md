@@ -6,12 +6,6 @@ An attempt at running LedFX inside a docker container
 
 ### **Dockerfile:**
 
-How to use:
-
-```bash
-docker build -t ledfx .
-```
-
 This file uses the python:3.7-slim image:
 
 * It first creates a python virtual environment /ledfx/venv
@@ -24,13 +18,9 @@ This file uses the python:3.7-slim image:
 * EXPOSE ports 8888 and 5353
 * Launch ledfx
 
+How to use: `docker build -t ledfx .`
+
 ### **Dockerfile-2stage-1:**
-
-How to use:
-
-```bash
-docker build -t ledfx-2stage -f Dockerfile-2stage-1 .
-```
 
 This file uses the python:3.7-slim image:
 
@@ -55,13 +45,9 @@ This file uses the python:3.7-slim image:
 * EXPOSE ports 8888 and 5353
 * Launch ledfx
 
+How to use: `docker build -t ledfx-2stage -f Dockerfile-2stage-1 .`
+
 ### **Dockerfile-4stage:**
-
-How to use:
-
-```bash
-docker build -t ledfx-4stage -f Dockerfile-4stage .
-```
 
 This file uses docker's multi-stage build technique to speed up the build process using the cache and cut down the overall size of the final image.
 
@@ -100,15 +86,11 @@ By creating the venv and compile images in the beggining of the Dockerfile, we c
 * EXPOSE ports 8888 and 5353
 * Launch ledfx
 
+How to use: `docker build -t ledfx-4stage -f Dockerfile-4stage .`
+
 ### **Dockerfile.venv, Dockerfile.compile, Dockerfile.build:**
 
 These files take a similar approach to Dockerfile-4stage. They differ in the fact that they use 3 independent Dockerfile's to achieve the same results. I'm not sure if this is significant, but I was learning how to create Dockerfile's when I wrote these so I decided to try it out.
-
-How to use:
-
-```bash
-docker build -t thatdonfc/ledfx-venv -f Dockerfile.venv .
-```
 
 1. Dockerfile.venv
 
@@ -116,20 +98,16 @@ docker build -t thatdonfc/ledfx-venv -f Dockerfile.venv .
 * Create a python venv /ledfx/venv and "activate" it by adding it to the PATH
 * Install run dependencies with apt-get
 
-```bash
-docker build -t thatdonfc/ledfx-compile -f Dockerfile.compile .
-```
+How to use: `docker build -t thatdonfc/ledfx-venv -f Dockerfile.venv .`
 
-1. Dockerfile.compile
+2. Dockerfile.compile
 
 * Create "compile-image" from "venv-image" named thatdonfc/ledfx-venv
 * Activate the venv by adding it to the PATH
 * Install build dependencies with apt-get
 * Install ledfx-dev with pip
 
-```bash
-docker build -t thatdonfc/ledfx-build -f Dockerfile.build .
-```
+How to use: `docker build -t thatdonfc/ledfx-compile -f Dockerfile.compile .`
 
 3. Dockerfile.build
 
@@ -140,3 +118,5 @@ docker build -t thatdonfc/ledfx-build -f Dockerfile.build .
 * Set WORKDIR to ledfx home directory and change USER to ledfx
 * EXPOSE ports 8888 and 5353
 * Launch ledfx
+
+How to use: `docker build -t thatdonfc/ledfx-build -f Dockerfile.build .`
