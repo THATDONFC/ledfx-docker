@@ -14,7 +14,7 @@ jobs:
   ledfx-2stage:
     env:
       IMAGE_NAME: ledfx-2stage
-    name: Build LedFx on ubuntu-latest
+    name: Build LedFx-2stage on ubuntu-latest
     runs-on: ubuntu-latest
 
     steps:
@@ -26,7 +26,7 @@ jobs:
   ledfx-4stage:
     env:
       IMAGE_NAME: ledfx-4stage
-    name: Build LedFx on ubuntu-latest
+    name: Build LedFx-4stage on ubuntu-latest
     runs-on: ubuntu-latest
 
     steps:
@@ -38,7 +38,7 @@ jobs:
   ledfx-venv:
     env:
       IMAGE_NAME: ledfx-venv
-    name: Build LedFx on ubuntu-latest
+    name: Build LedFx-venv on ubuntu-latest
     runs-on: ubuntu-latest
 
     steps:
@@ -51,7 +51,7 @@ jobs:
     needs: ledfx-venv  
     env:
       IMAGE_NAME: ledfx-compile
-    name: Build LedFx on ubuntu-latest
+    name: Build LedFx-compile on ubuntu-latest
     runs-on: ubuntu-latest
 
     steps:
@@ -60,11 +60,11 @@ jobs:
         run: |
           docker build --file Dockerfile.compile --tag ledfx-compile .
   
-  ledfx-:
+  ledfx-build:
     needs: [ledfx-venv, ledfx-compile]  
     env:
       IMAGE_NAME: ledfx-build
-    name: Build LedFx on ubuntu-latest
+    name: Build LedFx-build on ubuntu-latest
     runs-on: ubuntu-latest
 
     steps:
