@@ -1,0 +1,58 @@
+# Create docker image from python3.7-slim
+FROM python:3.7-slim AS compile-image
+
+# Set the working directory in the container
+WORKDIR /ledfx
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        gcc \
+        libc-dev \
+        nodejs \
+        npm
+RUN apt-get install -y \
+        alsa-utils \
+        git \
+        libasound2 \
+        libasound2-plugins \
+        portaudio19-dev \
+RUN git clone https://github.com/THATDONFC/ledfx -b dev /ledfx \
+      && cd /ledfx/frontend
+RUN npm install -g yarn \
+      && yarn \
+      && yarn build \
+      && cd ..
+RUN pip install -r requirements.txt \
+    && mkdir ledfx-wheel \
+    && python setup.py bdist_wheel -d ledfx-wheel
+
+# Create docker image from python3.7-slim and copy built wheel from compile-image
+FROM python:3.7-slim AS build-image
+RUN useradd --create-home ledfx
+WORKDIR /home/ledfx
+USER ledfx
+COPY --from=compile-image /ledfx/ledfx-wheel /ledfx
+
+RUN export LEDFX=$(ls /ledfx/*.whl) \
+      && apt-get update \
+      && apt-get install -y --no-install-recommends \
+        gcc \
+        libc-dev \
+      && apt-get install -y \
+        alsa-utils \
+        libasound2 \
+        libasound2-plugins \
+        portaudio19-dev \
+      && cd /ledfx \
+      && pip install $LEDFX \
+      && apt-get purge -y gcc libc-dev \
+      && apt-get clean -y \
+      && apt-get autoremove -y \
+      && rm -rf /var/lib/apt/lists/*
+
+#USER ledfx
+
+EXPOSE 8888/tcp
+EXPOSE 5353/udp
+ENTRYPOINT [ "ledfx"]
+CMD ["--host 0.0.0.0","-p 8888"]
+

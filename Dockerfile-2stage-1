@@ -1,0 +1,53 @@
+# Create docker image from python3.7-slim
+FROM python:3.7-slim AS compile-image
+
+# Set the working directory in the container
+WORKDIR /ledfx
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        gcc \
+        build-essential \
+        nodejs \
+        npm
+RUN apt-get install -y \
+        alsa-utils \
+        git \
+      #   libasound2 \
+      #   libasound2-plugins \
+        portaudio19-dev
+
+RUN git clone https://github.com/THATDONFC/ledfx -b dev /ledfx
+RUN cd /ledfx/frontend \
+      && npm install -g yarn \
+      && yarn \
+      && yarn build \
+      && cd ..
+
+RUN python -m venv /ledfx/venv
+ENV PATH="/ledfx/venv/bin:$PATH"
+RUN pip install -r requirements.txt
+RUN pip install .
+
+# Create docker image from python3.7-slim
+FROM python:3.7-slim AS build-image
+COPY --from=compile-image /ledfx/venv /ledfx/venv
+ENV PATH="/ledfx/venv/bin:$PATH"
+
+RUN apt-get update && apt-get install -y \
+        alsa-utils \
+        libasound2 \
+        libasound2-plugins \
+        portaudio19-dev \
+      && apt-get clean -y \
+      && apt-get autoremove -y \
+      && rm -rf /var/lib/apt/lists/*
+
+RUN useradd --create-home ledfx
+WORKDIR /home/ledfx
+USER ledfx
+
+EXPOSE 8888/tcp
+EXPOSE 5353/udp
+ENTRYPOINT [ "ledfx"]
+CMD ["--host 0.0.0.0","--port 8888"]
+
