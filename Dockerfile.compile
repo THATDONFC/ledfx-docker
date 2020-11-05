@@ -1,6 +1,6 @@
 ### Create docker image from venv-image as compile-image to speed up builds
 #
-FROM thatdonfc/ledfx-venv AS compile-image
+FROM ledfx-venv AS compile-image
 ENV PATH="/ledfx/venv/bin:$PATH"
 WORKDIR /ledfx
 RUN apt-get update && apt-get install -y --no-install-recommends \

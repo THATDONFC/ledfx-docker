@@ -1,6 +1,6 @@
 # Create docker image from python3.7-slim
-FROM thatdonfc/ledfx-venv
-COPY --from=thatdonfc/ledfx-compile /ledfx/venv /ledfx/venv
+FROM ledfx-venv
+COPY --from=ledfx-compile /ledfx/venv /ledfx/venv
 # ENV PATH="/ledfx/venv/bin:$PATH"
 
 # Remove uneeded packages
