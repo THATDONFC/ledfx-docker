@@ -51,7 +51,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: ledfx-venv
-          path: /
+          path: .
           
   ledfx-compile:
     needs: ledfx-venv  
@@ -73,12 +73,12 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: ledfx-venv
-          path: /
+          path: .
       - name: Upload ledfx-compile to /
         uses: actions/upload-artifact@v2
         with:
           name: ledfx-compile
-          path: /
+          path: .
   
   ledfx-build:
     needs: [ledfx-venv, ledfx-compile]  
