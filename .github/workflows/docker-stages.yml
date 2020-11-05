@@ -1,0 +1,74 @@
+name: Docker-stages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/docker-stages*'
+      - '!Dockerfile'
+      - '!ledfx*/**'
+  workflow_dispatch:
+
+jobs:
+  ledfx-2stage:
+    env:
+      IMAGE_NAME: ledfx-2stage
+    name: Build LedFx-2stage on ubuntu-latest
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build $IMAGE_NAME
+        run: |
+          docker build --file Dockerfile-2stage-1 --tag ledfx-2stage .
+          
+  ledfx-4stage:
+    env:
+      IMAGE_NAME: ledfx-4stage
+    name: Build LedFx-4stage on ubuntu-latest
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build $IMAGE_NAME
+        run: |
+          docker build --file Dockerfile-4stage --tag ledfx-4stage .
+          
+  ledfx-venv:
+    env:
+      IMAGE_NAME: ledfx-venv
+    name: Build LedFx-venv on ubuntu-latest
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build $IMAGE_NAME
+        run: |
+          docker build --file Dockerfile.venv --tag ledfx-venv .
+          
+  ledfx-compile:
+    needs: ledfx-venv  
+    env:
+      IMAGE_NAME: ledfx-compile
+    name: Build LedFx-compile on ubuntu-latest
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build $IMAGE_NAME
+        run: |
+          docker build --file Dockerfile.compile --tag ledfx-compile .
+  
+  ledfx-build:
+    needs: [ledfx-venv, ledfx-compile]  
+    env:
+      IMAGE_NAME: ledfx-build
+    name: Build LedFx-build on ubuntu-latest
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build $IMAGE_NAME
+        run: |
+          docker build --file Dockerfile.build --tag ledfx-build .

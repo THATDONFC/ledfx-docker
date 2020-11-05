@@ -4,8 +4,12 @@ on:
   push:
     branches:
       - main
-    tags:
-      - v*
+    paths:
+      - '.github/**'
+      - 'Dockerfile'
+      - '!ledfx*/**'
+      - '!*-*'
+      - '!*.*'
 
 jobs:
   ledfx:
