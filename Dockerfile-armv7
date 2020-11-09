@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         # libasound2-plugins \
         libatlas3-base \
         portaudio19-dev \
-        python3-dev \
+        python3-dev
         # pulseaudio \
 RUN pip install ledfx-dev==0.8.3-dev1
 
