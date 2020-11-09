@@ -1,6 +1,6 @@
-# Create docker image from python3.9-slim
-# This image serves as the bas compile image
-FROM python:3.9-slim AS compile-image
+# Create docker image from arm32v7/python:3.9-slim
+# This image serves as the base compile image
+FROM arm32v7/python:3.9-slim AS compile-image
 
 # Create python venv and add it to PATH
 RUN python -m venv /ledfx/venv
@@ -21,9 +21,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         # pulseaudio \
 RUN pip install ledfx-dev==0.8.3-dev1
 
-# Create python:3.9-slim image
+# Create arm32v7/python:3.9-slim image
 # This image copies from compile image for a smaller final image
-FROM python:3.9-slim AS build-image
+FROM arm32v7/python:3.9-slim AS build-image
 COPY --from=compile-image /ledfx/venv /ledfx/venv
 ENV PATH="/ledfx/venv/bin:$PATH"
 
