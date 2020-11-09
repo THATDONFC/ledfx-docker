@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         portaudio19-dev \
         python3-dev \
         # pulseaudio \
-RUN pip install ledfx-dev==0.8.3.dev1
+RUN pip install ledfx-dev==0.8.3-dev1
 
 # Create python:3.9-slim image
 # This image copies from compile image for a smaller final image
