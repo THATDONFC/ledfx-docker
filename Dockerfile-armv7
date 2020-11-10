@@ -25,6 +25,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 FROM compile-image AS venv-image
 ARG LEDFX_PYPI
+RUN pip install --upgrade pip wheel setuptools
 RUN pip install $LEDFX_PYPI
 
 
