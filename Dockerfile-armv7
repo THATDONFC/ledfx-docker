@@ -1,37 +1,40 @@
 
-##################################################
 # Create docker image from arm32v7/python:3.9-slim
 # This image serves as the base compile image
-#
+
+############### COMPILE IMAGE ###############
 FROM arm32v7/python:3.9-slim AS compile-image
+
 # Create python venv and add it to PATH
+
 RUN python -m venv /ledfx/venv
 ENV PATH="/ledfx/venv/bin:$PATH"
-# Install dependencies and ledfx, remove uneeded packages
-RUN pip install Cython
+
+# Install compile dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        # build-essential \
-        # libc-dev \
+        # build-essential libc-dev \
         gcc \
     && apt-get install -y \
-        # alsa-utils \
-        # libasound2 \
-        # libasound2-plugins \
+        # alsa-utils libasound2 libasound2-plugins \
         libatlas3-base \
         portaudio19-dev \
         # pulseaudio \
         python3-dev
 
-
+########## VENV IMAGE ##########
 FROM compile-image AS venv-image
-ARG LEDFX_PYPI
 RUN pip install --upgrade pip wheel setuptools
+RUN pip install Cython
+ARG LEDFX_PYPI='ledfx-dev'
 RUN pip install $LEDFX_PYPI
 
 
 # Create arm32v7/python:3.9-slim image
-# This image copies from compile image for a smaller final image
+# This image copies /ledfx/venv from compile-image for a smaller final image
+
+############### BUILD IMAGE ###############
 FROM arm32v7/python:3.9-slim AS build-image
+
 COPY --from=venv-image /ledfx/venv /ledfx/venv
 ENV PATH="/ledfx/venv/bin:$PATH"
 WORKDIR /ledfx
@@ -41,12 +44,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         portaudio19-dev \
         && rm -rf /var/lib/apt/lists/*
 # Add user `ledfx` and create home folder
-RUN useradd --create-home ledfx
+RUN useradd --create-home ledfx --groups audio
 # Set the working directory in the container
 WORKDIR /home/ledfx
 USER ledfx
-# Expose port 8888 for web server and 5353 for mDNS discovery
+# Expose port 8888 for web server
 EXPOSE 8888/tcp
-EXPOSE 5353/udp
 ENTRYPOINT [ "ledfx"]
-CMD ["--host 0.0.0.0","--port 8888"]
+CMD ["--host 0.0.0.0"]
