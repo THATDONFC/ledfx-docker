@@ -1,25 +1,23 @@
-# Create docker image from python3.7-slim
-FROM python:3.7-slim
+# Create docker image from python3.9-slim
+FROM python:3.9-slim
 
 # Create python venv and add it to PATH
-RUN python -m venv /ledfx/venv
+RUN python -m venv /ledfx/venv \
+        && python -m pip install -U pip wheel setuptools
 ENV PATH="/ledfx/venv/bin:$PATH"
 
 # Install dependencies and ledfx, remove uneeded packages
 #
-# TRY WITH build-essential and portaudio19-dev ONLY
-# 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         gcc \
-        libc-dev \
     && apt-get install -y \
-        alsa-utils \
-        libasound2 \
-        libasound2-plugins \
+        # alsa-utils \
+        libatlas3-base \
         portaudio19-dev \
-        pulseaudio \
+        # pulseaudio \
+        python3-dev \
     && pip install ledfx-dev \
-    && apt-get purge -y gcc libc-dev \
+    && apt-get purge -y gcc python3-dev \
     && apt-get clean -y \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
@@ -34,4 +32,3 @@ USER ledfx
 EXPOSE 8888/tcp
 EXPOSE 5353/udp
 ENTRYPOINT [ "ledfx"]
-#CMD ["--host 0.0.0.0","--port 8888"]

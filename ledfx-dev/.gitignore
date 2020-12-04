@@ -1,0 +1,63 @@
+# Temporary and binary files
+*~
+*.py[cod]
+*.so
+*.cfg
+!setup.cfg
+*.orig
+*.log
+*.pot
+__pycache__/*
+.cache/*
+.*.swp
+*/.ipynb_checkpoints/*
+*.DS_Store
+
+# Python env
+env
+
+# NPM
+node_modules/
+npm-debug.log
+package-lock.json
+
+# Project files
+.ropeproject
+.project
+.pydevproject
+.settings
+.idea
+#.vscode
+*.code-workspace
+
+# Package files
+*.egg
+*.eggs/
+.installed.cfg
+*.egg-info
+
+# Unittest and coverage
+htmlcov/*
+.coverage
+.tox
+junit.xml
+coverage.xml
+
+# Build and docs folder/files
+build/*
+dist/*
+sdist/*
+docs/api/*
+docs/_build/*
+cover/*
+MANIFEST
+
+
+
+# Keyfile and pyupdater files for signing pyupdater
+keypack.pyu
+.pyupdater/
+pyu-data/
+# Sentry Data
+ledfx/sentry_config.py
+formatting_test.bat

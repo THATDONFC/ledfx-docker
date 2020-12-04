@@ -1,17 +1,17 @@
 ### Create docker image from python3.7-slim
 #
 # Set up base venv image to start the build
-FROM python:3.7-slim AS venv-image
+FROM python:3.9-slim AS venv-image
 # Create python venv and add it to PATH
 RUN python -m venv /ledfx/venv
 ENV PATH="/ledfx/venv/bin:$PATH"
+RUN python -m pip install --upgrade pip wheel setuptools
 # Install dependencies and ledfx, remove uneeded packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        alsa-utils \
-        libasound2 \
-        libasound2-plugins \
+#        alsa-utils \
+        libatlas3-base \
         portaudio19-dev \
-        pulseaudio \
+#        pulseaudio \
     && apt-get clean -y \
     && apt-get autoremove -y
 
@@ -20,10 +20,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 FROM venv-image AS compile-image
 RUN apt-get update && apt-get install -y --no-install-recommends \
         gcc \
+        git \
         libc-dev \
         nodejs \
         npm \
-        git
+        python3-dev
 
 ### Create docker image from compile-image to pull and build from github
 #
@@ -36,6 +37,7 @@ RUN git clone https://github.com/THATDONFC/ledfx -b dev /ledfx-git \
       && npm install -g yarn \
       && yarn && yarn build \
       && cd ..
+RUN pip install pyupdater>=3.1.1
 RUN pip install -r requirements.txt
 RUN pip install .
 #     && mkdir ledfx-wheel \
@@ -50,12 +52,10 @@ ENV PATH="/ledfx/venv/bin:$PATH"
 
 RUN rm -rf /var/lib/apt/lists/*
 
-RUN useradd --create-home ledfx
+RUN useradd --create-home ledfx --groups audio
 WORKDIR /home/ledfx
 USER ledfx
 
 EXPOSE 8888/tcp
 EXPOSE 5353/udp
 ENTRYPOINT [ "ledfx"]
-# CMD ["--host 0.0.0.0","-p 8888"]
-
