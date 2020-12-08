@@ -8,10 +8,10 @@ ENV PATH="/ledfx/venv/bin:$PATH"
 RUN python -m pip install --upgrade pip wheel setuptools
 # Install dependencies and ledfx, remove uneeded packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
-#        alsa-utils \
         libatlas3-base \
+        libavformat58 \
         portaudio19-dev \
-#        pulseaudio \
+        pulseaudio \
     && apt-get clean -y \
     && apt-get autoremove -y
 
@@ -37,11 +37,9 @@ RUN git clone https://github.com/THATDONFC/ledfx -b dev /ledfx-git \
       && npm install -g yarn \
       && yarn && yarn build \
       && cd ..
-RUN pip install pyupdater>=3.1.1
 RUN pip install -r requirements.txt
-RUN pip install .
-#     && mkdir ledfx-wheel \
-#     && python setup.py bdist_wheel -d ledfx-wheel
+RUN python setup.py build
+RUN python setup.py install
 
 # Create docker image from venv-image to build dist-image
 #
