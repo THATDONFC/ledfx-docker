@@ -22,7 +22,7 @@ jobs:
       - name: Build ${{ env.IMAGE_NAME }}
         run: |
           docker build --file Dockerfile-2stage-1 --tag ledfx-2stage .
-          
+
   ledfx-4stage:
     env:
       IMAGE_NAME: ledfx-4stage
@@ -34,8 +34,19 @@ jobs:
       - name: Build ${{ env.IMAGE_NAME }}
         run: |
           docker build --file Dockerfile-4stage --tag ledfx-4stage .
-          
-          
+
+  ledfx-armv7:
+    env:
+      IMAGE_NAME: ledfx-armv7
+    name: Build LedFx-armv7 on ubuntu-latest
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build ${{ env.IMAGE_NAME }}
+        run: |
+          docker build --file Dockerfile-armv7 --tag ledfx-armv7 .
+
   ledfx-multistage:
     env:
       IMAGE_NAME: ledfx-multistage
@@ -67,9 +78,9 @@ jobs:
 #         with:
 #           name: ledfx-venv
 #           path: .
-          
+
 #   ledfx-compile:
-#     needs: ledfx-venv  
+#     needs: ledfx-venv
 #     env:
 #       IMAGE_NAME: ledfx-compile
 #     name: Build LedFx-compile on ubuntu-latest
@@ -94,9 +105,9 @@ jobs:
 #         with:
 #           name: ledfx-compile
 #           path: .
-  
+
 #   ledfx-build:
-#     needs: [ledfx-venv, ledfx-compile]  
+#     needs: [ledfx-venv, ledfx-compile]
 #     env:
 #       IMAGE_NAME: ledfx-build
 #     name: Build LedFx-build on ubuntu-latest
